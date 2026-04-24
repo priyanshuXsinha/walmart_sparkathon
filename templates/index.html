@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walmart Sparkathon - Inventory & Sustainability</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #1a1a2e; --bg-card: #202040; --text-primary: #e0e0e0; --text-secondary: #a0a0a0;
+            --accent-blue: #007bff; --accent-green: #28a745; --accent-dark-green: #218838; --error-red: #dc3545;
+            --border-color: #333366; --table-header-bg: #2a2a50; --table-row-even: #25254a;
+            --table-row-hover: #30305a; --input-bg: #282858; --input-border: #444488;
+            --badge-none-bg: var(--text-secondary); --badge-bronze-bg: #cd7f32; --badge-silver-bg: #c0c0c0;
+            --badge-gold-bg: #ffd700;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-primary); line-height: 1.6; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; overflow-x: hidden; }
+        .container { max-width: 960px; width: 95%; margin: 40px auto; background: var(--bg-dark); padding: 0; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); border-radius: 12px; overflow: hidden; }
+        .app-header { background-color: var(--bg-card); padding: 30px 25px; text-align: center; border-bottom: 1px solid var(--border-color); border-radius: 12px 12px 0 0; }
+        
+        /* === CHANGE 1: INCREASED LOGO SIZE === */
+        .app-header .logo { 
+            width: 500px; /* Set a larger, explicit width */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 15px; /* A little more space looks better */
+            filter: invert(0.9); 
+        }
+
+        .app-header h1 { color: var(--text-primary); font-size: 2.8em; font-weight: 700; margin-bottom: 10px; }
+        .app-header .tagline { color: var(--text-secondary); font-size: 1.1em; font-weight: 300; }
+        main { padding: 25px; display: grid; gap: 30px; }
+        .card { background-color: var(--bg-card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); }
+        .card h2 { color: var(--accent-blue); font-size: 2em; font-weight: 600; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        .card-description { color: var(--text-secondary); margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .form-group label { font-weight: 500; color: var(--text-primary); margin-bottom: 8px; display: block; }
+        input[type="text"], input[type="date"], input[type="number"] { width: 100%; padding: 12px 15px; border: 1px solid var(--input-border); border-radius: 8px; background-color: var(--input-bg); color: var(--text-primary); font-size: 1em; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; }
+        input[type="text"]::placeholder, input[type="date"]::placeholder { color: var(--text-secondary); }
+        input[type="date"] { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19 4h-2V2h-2v2H9V2H7v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 24px; }
+        input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); outline: none; }
+        .button-group { display: flex; gap: 15px; justify-content: flex-start; margin-top: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: background-color 0.3s ease, transform 0.2s ease; text-transform: uppercase; }
+        .btn-primary { background-color: var(--accent-green); color: white; }
+        .btn-primary:hover { background-color: var(--accent-dark-green); transform: translateY(-2px); }
+        .btn-secondary { background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); }
+        .btn-secondary:hover { background-color: #333366; transform: translateY(-2px); }
+        .result-box { background-color: var(--table-row-even); border: 1px solid var(--accent-green); box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2); margin-top: 30px; }
+        .result-box h3 { color: var(--accent-blue); font-size: 1.4em; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .result-item { padding: 10px; border-radius: 6px; background-color: var(--input-bg); display: flex; flex-direction: column; }
+        .result-item .label { color: var(--text-secondary); font-size: 0.9em; font-weight: 500; margin-bottom: 4px; }
+        .result-item span:not(.label) { color: var(--text-primary); font-size: 1.1em; font-weight: 600; }
+        .error-message { color: var(--error-red); background-color: rgba(220, 53, 69, 0.2); border: 1px solid var(--error-red); border-radius: 8px; padding: 15px; margin-top: 20px; font-weight: bold; text-align: center; box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2); }
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; background-color: var(--input-bg); border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid var(--border-color); padding: 15px; text-align: left; color: var(--text-primary); }
+        th { background-color: var(--table-header-bg); font-weight: 600; color: var(--accent-blue); text-transform: uppercase; font-size: 0.9em; }
+        tbody tr:nth-child(even) { background-color: var(--table-row-even); }
+        tbody tr:hover { background-color: var(--table-row-hover); transition: background-color 0.2s ease; }
+        .app-footer { text-align: center; padding: 20px; margin-top: 30px; color: var(--text-secondary); font-size: 0.9em; border-top: 1px solid var(--border-color); background-color: var(--bg-card); border-radius: 0 0 12px 12px; }
+        @media (max-width: 768px) { .app-header h1 { font-size: 2.2em; } .form-grid, .result-grid { grid-template-columns: 1fr; } .button-group { flex-direction: column; align-items: center; } .btn { width: 100%; } }
+        .badge { display: inline-block; padding: 0.3em 0.8em; font-size: 0.85em; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; text-transform: uppercase; color: var(--bg-dark); }
+        .badge-none { background-color: var(--badge-none-bg); color: var(--text-primary); }
+        .badge-bronze { background-color: var(--badge-bronze-bg); color: white; }
+        .badge-silver { background-color: var(--badge-silver-bg); color: var(--bg-dark); }
+        .badge-gold { background-color: var(--badge-gold-bg); color: var(--bg-dark); }
+        .progress-bar-container { width: 100%; background-color: var(--input-bg); border-radius: 5px; height: 10px; overflow: hidden; margin-bottom: 5px; }
+        .progress-bar-fill { height: 100%; width: 0%; border-radius: 5px; transition: width 0.5s ease-in-out; }
+        .progress-good { background-color: var(--accent-green); }
+        .progress-bad { background-color: var(--error-red); }
+        .progress-label { font-size: 0.85em; color: var(--text-secondary); display: block; }
+        .progress-bad-text { color: var(--error-red); font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <!-- === CHANGE 2: USE url_for TO GET THE CORRECT IMAGE PATH === -->
+            <img src="{{ url_for('static', filename='walmart.png') }}"
+     alt="Walmart Logo"
+     class="logo">
+
+            
+            <h1>Sparkathon: Smart Inventory & Sustainability</h1>
+            <p class="tagline">Optimize purchases, reduce waste, and track carbon footprint</p>
+        </header>
+        <main>
+            <section class="card forecast-section">
+                <h2>📊 Inventory Forecast</h2>
+                <p class="card-description">Enter product details to predict demand, adjust pricing, and estimate environmental impact.</p>
+                <form id="forecastForm" onsubmit="event.preventDefault(); sendRequest();">
+                    <div class="form-grid">
+                        <div class="form-group"><label for="store_id">Store ID:</label><input type="text" id="store_id" value="CA_1" placeholder="e.g., CA_1"></div>
+                        <div class="form-group"><label for="product_id">Product ID:</label><input type="text" id="product_id" value="FOODS_1_001" placeholder="e.g., FOODS_1_001"></div>
+                        <div class="form-group"><label for="forecast_date">Forecast Date:</label><input type="date" id="forecast_date" value="2016-05-05"></div>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Get Forecast</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+                    </div>
+                </form>
+                <div id="forecastResult" class="result-box" style="display:none;">
+                    <h3>Forecast Results:</h3>
+                    <div class="result-grid">
+                        <div class="result-item"><span class="label">Store:</span> <span id="res_store"></span></div>
+                        <div class="result-item"><span class="label">Item:</span> <span id="res_item"></span></div>
+                        <div class="result-item"><span class="label">Date:</span> <span id="res_date"></span></div>
+                        <div class="result-item"><span class="label">Expected Demand:</span> <span id="res_expected_qty"></span> units</div>
+                        <div class="result-item"><span class="label">Recommended Order:</span> <span id="res_order_qty"></span> units</div>
+                        <div class="result-item"><span class="label">Adjusted Unit Price:</span> $<span id="res_price"></span></div>
+                        <div class="result-item"><span class="label">Estimated CO₂ (Order):</span> <span id="res_co2_kg"></span> kgCO₂e</div>
+                    </div>
+                </div>
+                <p id="errorMessage" class="error-message" style="display:none;"></p>
+            </section>
+            <section class="card leaderboard-section">
+                <h2>🏆 Sustainability Leaderboard</h2>
+                <p class="card-description">See how stores rank in carbon reduction through optimized inventory management.</p>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="getLeaderboard()">Refresh Leaderboard</button>
+                </div>
+                <div id="leaderboardResult" class="table-container">
+                    <table>
+                        <thead><tr><th>Rank</th><th>Store Name</th><th>CO₂ This Month (kg)</th><th>Badge</th><th>% Reduction vs. Prev. Month</th></tr></thead>
+                        <tbody id="leaderboardTableBody"></tbody>
+                    </table>
+                </div>
+                <p id="leaderboardError" class="error-message" style="display:none;"></p>
+            </section>
+        </main>
+        <footer class="app-footer"><p>&copy; 2025 Walmart Sparkathon. All rights reserved.</p></footer>
+    </div>
+
+    <script>
+        const API_URL = ""; 
+
+        async function sendRequest() {
+            const storeId = document.getElementById('store_id').value;
+            const productId = document.getElementById('product_id').value;
+            const forecastDate = document.getElementById('forecast_date').value;
+
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('forecastResult').style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}/forecast`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        store_id: storeId,
+                        product_id: productId,
+                        fc_date: forecastDate
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('res_store').textContent = data.store_id;
+                    document.getElementById('res_item').textContent = data.product_id;
+                    document.getElementById('res_date').textContent = data.fc_date;
+                    document.getElementById('res_expected_qty').textContent = data.expected_qty;
+                    document.getElementById('res_order_qty').textContent = data.order_qty;
+                    document.getElementById('res_price').textContent = data.price;
+                    document.getElementById('res_co2_kg').textContent = data.co2_kg;
+                    document.getElementById('forecastResult').style.display = 'block';
+                } else {
+                    document.getElementById('errorMessage').textContent = data.error || 'An unknown error occurred.';
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Failed to connect to the backend for forecast.';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        async function getLeaderboard() {
+            document.getElementById('leaderboardError').style.display = 'none';
+            const tbody = document.getElementById('leaderboardTableBody');
+            tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+
+            try {
+                const response = await fetch(`${API_URL}/leaderboard`);
+                const data = await response.json();
+
+                tbody.innerHTML = ''; 
+                if (response.ok) {
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5">No sustainability data logged yet. Click "Get Forecast" to begin.</td></tr>';
+                    } else {
+                        data.forEach((entry, index) => {
+                            const row = tbody.insertRow();
+                            row.insertCell().textContent = index + 1;
+                            row.insertCell().textContent = entry.store;
+                            row.insertCell().textContent = entry.total_co2_kg;
+
+                            const badgeCell = row.insertCell();
+                            const badgeSpan = document.createElement('span');
+                            badgeSpan.className = `badge badge-${entry.badge.toLowerCase()}`;
+                            badgeSpan.textContent = entry.badge;
+                            badgeCell.appendChild(badgeSpan);
+
+                            const reductionCell = row.insertCell();
+                            const progressBarContainer = document.createElement('div');
+                            progressBarContainer.className = 'progress-bar-container';
+                            const progressBarFill = document.createElement('div');
+                            let reductionText = 'N/A';
+                            
+                            if (entry.prev_month_co2 > 0 || (entry.prev_month_co2 === 0 && entry.total_co2_kg > 0)) {
+                                let progressValue = 0;
+                                if (entry.co2_reduction_percent >= 0) {
+                                    reductionText = `Reduced by ${entry.co2_reduction_percent}%`;
+                                    progressBarFill.className = 'progress-bar-fill progress-good';
+                                    progressValue = Math.min(100, Math.max(0, entry.co2_reduction_percent));
+                                } else {
+                                    reductionText = `Increased by ${Math.abs(entry.co2_reduction_percent)}%`;
+                                    progressBarFill.className = 'progress-bar-fill progress-bad';
+                                    progressValue = Math.min(100, Math.max(0, Math.abs(entry.co2_reduction_percent)));
+                                }
+                                progressBarFill.style.width = `${progressValue}%`;
+                                progressBarContainer.appendChild(progressBarFill);
+                                reductionCell.appendChild(progressBarContainer);
+                            }
+                            const reductionLabel = document.createElement('span');
+                            reductionLabel.className = 'progress-label';
+                            reductionLabel.textContent = reductionText;
+                            reductionCell.appendChild(reductionLabel);
+                        });
+                    }
+                } else {
+                    document.getElementById('leaderboardError').textContent = data.error || 'Unknown leaderboard error.';
+                    document.getElementById('leaderboardError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('leaderboardError').textContent = 'Failed to connect to the backend for leaderboard.';
+                document.getElementById('leaderboardError').style.display = 'block';
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('store_id').value = 'CA_1';
+            document.getElementById('product_id').value = 'FOODS_1_001';
+            document.getElementById('forecast_date').value = '2016-05-05';
+            document.getElementById('forecastResult').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        window.onload = getLeaderboard;
+    </script>
+</body>
+</html>
